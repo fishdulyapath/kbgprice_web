@@ -43,6 +43,7 @@ import SplitterPanel from 'primevue/splitterpanel';
 import Password from 'primevue/password';
 import SelectButton from 'primevue/selectButton';
 import Tag from 'primevue/tag';
+import ToggleButton from 'primevue/toggleButton';
 
 import VueQrcode from '@chenfengyuan/vue-qrcode';
 
@@ -61,6 +62,7 @@ app.use(router);
 app.use(ToastService);
 
 app.component(VueQrcode.name, VueQrcode);
+app.component('ToggleButton', ToggleButton);
 app.component('Tag', Tag);
 app.component('SelectButton', SelectButton);
 app.component('Password', Password);

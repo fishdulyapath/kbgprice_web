@@ -489,3 +489,8 @@ function exportExcel() {
     </MainContentWarp>
   </AppLayout>
 </template>
+<style>
+.p-datatable .p-datatable-tbody > tr > td {
+  padding: 8px !important;
+}
+</style>
