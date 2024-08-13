@@ -1,16 +1,17 @@
 <script setup>
 import AppLayout from "@/components/layout/AppLayout.vue";
 import MainContentWarp from "@/components/MainContentWarp.vue";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useApp } from "@/stores/app.js";
 import { useRouter, useRoute } from "vue-router";
 import MasterdataService from "@/services/MasterdataService";
 import Utils from "@/utils/";
 import { FilterMatchMode } from "primevue/api";
 import XLSX from "xlsx";
-
+import { useToast } from "primevue/usetoast";
 const storeApp = useApp();
 
+const toast = useToast();
 const data_brand = ref([]);
 const data_category = ref([]);
 const data_design = ref([]);
@@ -233,20 +234,34 @@ function saveUpdate() {
       };
       data.push(obj);
     });
-    console.log(data);
-    // MasterdataService.saveItemPriceNM(data)
-    //   .then((res) => {
-    //     console.log(res);
-    //     if (res.success) {
-    //       toast.add({ severity: "success", summary: "บันทึกรายการสำเร็จ", detail: res.message });
-    //     } else {
-    //       toast.add({ severity: "error", summary: "บันทึกรายการล้มเหลว", detail: res.message });
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+
+    var post_data = {
+      creator_code: localStorage._usercode,
+      details: data,
+    };
+    console.log(post_data);
+    MasterdataService.saveItemPriceNM(post_data)
+      .then((res) => {
+        console.log(res);
+        if (res.success) {
+          getItemPriceList()
+          toast.add({ severity: "success", summary: "บันทึกรายการสำเร็จ", detail: res.message });
+        } else {
+          toast.add({ severity: "error", summary: "บันทึกรายการล้มเหลว", detail: res.message });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
+}
+
+function convertStatus(status) {
+  return status == 1 || status == "1"
+}
+
+function updateStatus(data, value) {
+  data.status = value ? 1 : 0;
 }
 
 function updatePrice() {
@@ -380,7 +395,7 @@ function exportExcel() {
               </div>
             </div>
           </Panel>
-          <Panel header="ปรับราคา และ ส่งออก" :toggleable="true" :collapsed="true">
+          <Panel header="ปรับราคา และ ส่งออก" :toggleable="true" :collapsed="false">
             <div class="grid formgrid p-fluid">
               <!-- <div class="field col-6 md:col-2">
                 <label class="font-medium text-900">จากจำนวน</label>
@@ -443,34 +458,12 @@ function exportExcel() {
           </Panel>
         </div>
         <div class="card shadow-2 border-round bg-white mt-2" v-if="data_list.length > 0" style="max-width: 97vw">
-          <DataTable
-            v-model:filters="filters"
-            editMode="cell"
-            @cell-edit-complete="onCellEditComplete"
-            :value="data_list"
-            v-model:selection="selectedProduct"
-            paginator
-            resizableColumns
-            columnResizeMode="fit"
-            showGridlines
-            :rows="10"
-            dataKey="roworder"
-            class="custom-small-datatable"
-            :loading="loading"
-            paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-            :rowsPerPageOptions="[10, 50, 100, 150]"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
-            responsiveLayout="scroll"
-            :globalFilterFields="['ic_code', 'unit_code', 'group_main', 'group_sub', 'sale_type', 'price_type', 'status']"
-          >
-            <template #header>
-              <div class="flex justify-content-start">
-                <span class="p-input-icon-left">
-                  <i class="pi pi-search" />
-                  <InputText v-model="filters['global'].value" placeholder="ค้นหา..." />
-                </span>
-              </div>
-            </template>
+          <DataTable  editMode="cell" @cell-edit-complete="onCellEditComplete" :value="data_list" v-model:selection="selectedProduct" paginator
+            resizableColumns columnResizeMode="fit" showGridlines :rows="10" dataKey="roworder" class="custom-small-datatable" :loading="loading"
+            paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown" :rowsPerPageOptions="[10, 50, 100, 150]"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}" responsiveLayout="scroll"
+            >
+  
             <template #empty> ไม่พบข้อมูล </template>
             <template #loading> กำลังโหลดข้อมูล กรุณารอสักครู่ </template>
             <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
@@ -490,14 +483,14 @@ function exportExcel() {
               <template #body="{ data }">
                 {{ formatNumber(data.from_qty) }}
               </template>
-           
+
             </Column>
 
             <Column field="to_qty" header="ถึงจำนวน" class="text-right" sortable>
               <template #body="{ data }">
                 {{ formatNumber(data.to_qty) }}
               </template>
-           
+
             </Column>
 
             <Column field="from_date" header="จากวันที่" class="text-center" sortable>
@@ -524,7 +517,8 @@ function exportExcel() {
               </template>
             </Column>
 
-            <Column field="sale_price1" header="ราคาแยกภาษี" bodyClass="text-right" sortable>
+            <Column field="sale_price1" header="ราคาแยกภาษี" bodyClass="text-right" sortable style="color:blueviolet">
+              
               <template #body="{ data }">
                 {{ Utils.formatMoney(data.sale_price1) }}
               </template>
@@ -533,7 +527,7 @@ function exportExcel() {
               </template>
             </Column>
 
-            <Column field="sale_price2" header="ราคารวมภาษี" bodyClass="text-right" sortable>
+            <Column field="sale_price2" header="ราคารวมภาษี" bodyClass="text-right" sortable style="color:orange">
               <template #body="{ data }">
                 {{ Utils.formatMoney(data.sale_price2) }}
               </template>
@@ -543,7 +537,7 @@ function exportExcel() {
             </Column>
             <Column field="status" header="สถานะ" class="text-center" sortable>
               <template #body="{ data }">
-                <Tag :value="getStatusName(data.status)" :severity="getStatusSeverity(data.status)" />
+                <Checkbox :model-value="convertStatus(data.status)" @update:model-value="value => updateStatus(data, value)" :binary="true" />
               </template>
             </Column>
 
@@ -579,7 +573,7 @@ function exportExcel() {
 
             <Column field="doc_date" header="วันที่" sortable>
               <template #body="{ data }">
-                <span v-if="data.doc_no != ''">{{ data.doc_date }} {{ data.doc_time }}</span>
+                <span v-if="data.doc_no != '' || data.creator_code != ''">{{ data.doc_date }} {{ data.doc_time }}</span>
               </template>
             </Column>
 
@@ -595,7 +589,7 @@ function exportExcel() {
   </AppLayout>
 </template>
 <style>
-.p-datatable .p-datatable-tbody > tr > td {
+.p-datatable .p-datatable-tbody>tr>td {
   padding: 8px !important;
 }
 </style>

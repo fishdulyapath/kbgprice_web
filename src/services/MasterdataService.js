@@ -26,6 +26,24 @@ export default {
       .post(`/createImportDocStd?dbname=${localStorage.dbname}&provider=${localStorage.provider}`, postData)
       .then((res) => res.data);
   },
+
+  saveItemPriceNM(postData) {
+    return instanceApi(true)
+      .post(`/saveItemPriceNM?dbname=${localStorage.dbname}&provider=${localStorage.provider}`, postData)
+      .then((res) => res.data);
+  },
+  
+  saveItemPriceSTD(postData) {
+    return instanceApi(true)
+      .post(`/saveItemPriceSTD?dbname=${localStorage.dbname}&provider=${localStorage.provider}`, postData)
+      .then((res) => res.data);
+  },
+  saveItemPurPrice(postData) {
+    return instanceApi(true)
+      .post(`/saveItemPurPrice?dbname=${localStorage.dbname}&provider=${localStorage.provider}`, postData)
+      .then((res) => res.data);
+  },
+  
   createImportDocPur(postData) {
     return instanceApi(true)
       .post(`/createImportDocPur?dbname=${localStorage.dbname}&provider=${localStorage.provider}`, postData)
@@ -47,21 +65,22 @@ export default {
       .get(`/getDocDetailPur?dbname=${localStorage.dbname}&provider=${localStorage.provider}&docno=${docno}`)
       .then((res) => res.data);
   },
-  getDocNMHistory(search, from_date, to_date) {
+  getDocNMHistory(search, from_date, to_date,sale_type,trans_type,price_type,groupmain,groupsub,itembrand,itemmodel,itempattern,itemcategory,itemdesign) {
     return instanceApi(true)
-      .get(`/getDocNMHistory?dbname=${localStorage.dbname}&provider=${localStorage.provider}&search=${search}&fromdate=${from_date}&todate=${to_date}`)
+      .get(`/getDocNMHistory?dbname=${localStorage.dbname}&provider=${localStorage.provider}&search=${search}&fromdate=${from_date}&todate=${to_date}&saletype=${sale_type}&transtype=${trans_type}&pricetype=${price_type}&groupmain=${groupmain}&groupsub=${groupsub}&itembrand=${itembrand}&itemmodel=${itemmodel}&itempattern=${itempattern}&itemcategory=${itemcategory}&itemdesign=${itemdesign}`)
       .then((res) => res.data);
   },
-  getDocStdHistory(search, from_date, to_date) {
+  getDocStdHistory(search, from_date, to_date,sale_type,trans_type,price_type,groupmain,groupsub,itembrand,itemmodel,itempattern,itemcategory,itemdesign) {
     return instanceApi(true)
-      .get(`/getDocStdHistory?dbname=${localStorage.dbname}&provider=${localStorage.provider}&search=${search}&fromdate=${from_date}&todate=${to_date}`)
+      .get(`/getDocStdHistory?dbname=${localStorage.dbname}&provider=${localStorage.provider}&search=${search}&fromdate=${from_date}&todate=${to_date}&saletype=${sale_type}&transtype=${trans_type}&pricetype=${price_type}&groupmain=${groupmain}&groupsub=${groupsub}&itembrand=${itembrand}&itemmodel=${itemmodel}&itempattern=${itempattern}&itemcategory=${itemcategory}&itemdesign=${itemdesign}`)
       .then((res) => res.data);
   },
-  getDocPurHistory(search, from_date, to_date) {
+  getDocPurHistory(search, from_date, to_date,sale_type,trans_type,price_type,groupmain,groupsub,itembrand,itemmodel,itempattern,itemcategory,itemdesign) {
     return instanceApi(true)
-      .get(`/getDocPurHistory?dbname=${localStorage.dbname}&provider=${localStorage.provider}&search=${search}&fromdate=${from_date}&todate=${to_date}`)
+      .get(`/getDocPurHistory?dbname=${localStorage.dbname}&provider=${localStorage.provider}&search=${search}&fromdate=${from_date}&todate=${to_date}&saletype=${sale_type}&transtype=${trans_type}&pricetype=${price_type}&groupmain=${groupmain}&groupsub=${groupsub}&itembrand=${itembrand}&itemmodel=${itemmodel}&itempattern=${itempattern}&itemcategory=${itemcategory}&itemdesign=${itemdesign}`)
       .then((res) => res.data);
   },
+
   reactiveDocNM(postData) {
     return instanceApi(true)
       .post(`/reactiveDocNM?dbname=${localStorage.dbname}&provider=${localStorage.provider}`, postData)
@@ -87,10 +106,10 @@ export default {
       .get(`/getItemPriceStdList?dbname=${localStorage.dbname}&provider=${localStorage.provider}&search=${search}&saletype=${saletype}&transporttype=${transporttype}&pricetype=${pricetype}&groupmain=${groupmain}&itembrand=${itembrand}&groupsub=${groupsub}&itempattern=${itempattern}&itemmodel=${itemmodel}&itemcategory=${itemcategory}&itemdesign=${itemdesign}`)
       .then((res) => res.data);
   },
-  
-  getItemPriceDashboardList(search, saletype, transporttype, pricetype, groupmain, itembrand, groupsub, itempattern, itemmodel, itemcategory, itemdesign) {
+
+  getItemPriceDashboardList(search, saletype, transporttype, pricetype, groupmain, itembrand, groupsub, itempattern, itemmodel, itemcategory, itemdesign,nosentprice) {
     return instanceApi(true)
-      .get(`/getItemPriceDashboardList?dbname=${localStorage.dbname}&provider=${localStorage.provider}&search=${search}&saletype=${saletype}&transporttype=${transporttype}&pricetype=${pricetype}&groupmain=${groupmain}&itembrand=${itembrand}&groupsub=${groupsub}&itempattern=${itempattern}&itemmodel=${itemmodel}&itemcategory=${itemcategory}&itemdesign=${itemdesign}`)
+      .get(`/getItemPriceDashboardList?dbname=${localStorage.dbname}&provider=${localStorage.provider}&search=${search}&saletype=${saletype}&transporttype=${transporttype}&pricetype=${pricetype}&groupmain=${groupmain}&itembrand=${itembrand}&groupsub=${groupsub}&itempattern=${itempattern}&itemmodel=${itemmodel}&itemcategory=${itemcategory}&itemdesign=${itemdesign}&nosentprice=${nosentprice}`)
       .then((res) => res.data);
   },
 

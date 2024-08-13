@@ -23,6 +23,7 @@ const data_trans_type = ref([{ code: '0', name: 'รับเอง' }, { code: 
 const data_price_type = ref([{ code: '1', name: 'ปรกติ' }, { code: '2', name: 'ตามกลุ่ม' }, { code: '3', name: 'ตามลูกค้า' }]);
 const data_status = ref([{ code: '1', name: 'ใช้งาน' }, { code: '0', name: 'ยกเลิก' }]);
 const loading = ref(true);
+const nosentprice = ref(false)
 const filterData = ref({
   search: '',
   sale_type: null,
@@ -204,9 +205,10 @@ async function getItemPriceList() {
   var itempattern = filterData.value.pattern != null ? filterData.value.pattern : '';
   var itemcategory = filterData.value.category != null ? filterData.value.category : '';
   var itemdesign = filterData.value.design != null ? filterData.value.design : '';
+  var nosentpricex = nosentprice.value ? '1' : '0';
   loading.value = true;
 
-  await MasterdataService.getItemPriceDashboardList(filterData.value.search, sale_type, trans_type, price_type, groupmain, itembrand, groupsub, itempattern, itemmodel, itemcategory, itemdesign)
+  await MasterdataService.getItemPriceDashboardList(filterData.value.search, sale_type, trans_type, price_type, groupmain, itembrand, groupsub, itempattern, itemmodel, itemcategory, itemdesign,nosentpricex)
     .then((res) => {
       console.log(res);
       if (res.success) {
@@ -344,6 +346,16 @@ function exportExcel() {
                 <label class="font-medium text-900">หมวดหมู่</label>
                 <Dropdown v-model="filterData.category" :options="data_category" showClear filter optionLabel="name" optionValue="code" placeholder="เลือกหมวดหมู่" />
               </div>
+
+              <div class="field mb-4 col-12 ">
+                <div class="flex items-center">
+                  <Checkbox v-model="nosentprice" :binary="true" />
+                  <label  class="ml-2"> ไม่มีราคาขายส่ง </label>
+                </div>
+              </div>
+
+
+
               <div class="field col-12">
                 <Button label="ค้นหาสินค้า" icon="pi pi-play" class="w-auto p-button-success" @click="getItemPriceList"></Button>
               </div>
@@ -352,19 +364,11 @@ function exportExcel() {
 
         </div>
         <div class="card shadow-2 border-round bg-white mt-2" v-if="data_list.length > 0" style="max-width: 97vw;">
-          <DataTable v-model:filters="filters" :value="data_list" paginator resizableColumns columnResizeMode="fit" showGridlines :rows="10" dataKey="ic_code" :loading="loading"
+          <DataTable :value="data_list" paginator resizableColumns columnResizeMode="fit" showGridlines :rows="10" dataKey="ic_code" :loading="loading"
             v-model:expandedRows="expandedRows" @rowExpand="onRowExpand"
             paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown" :rowsPerPageOptions="[10, 50, 100, 150]"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}" responsiveLayout="scroll"
-            :globalFilterFields="['ic_code', 'unit_code', 'group_main', 'group_sub', 'sale_type', 'price_type', 'status']">
-            <template #header>
-              <div class="flex justify-content-start">
-                <span class="p-input-icon-left">
-                  <i class="pi pi-search" />
-                  <InputText v-model="filters['global'].value" placeholder="ค้นหา..." />
-                </span>
-              </div>
-            </template>
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}" responsiveLayout="scroll">
+
             <template #empty> ไม่พบข้อมูล </template>
             <template #loading> กำลังโหลดข้อมูล กรุณารอสักครู่ </template>
             <Column :expander="true" style="width: 3rem" />
@@ -375,13 +379,13 @@ function exportExcel() {
             </Column>
 
 
-            <Column field="ic_name" header="ชื่อ" class="text-center" sortable>
+            <Column field="ic_name" header="ชื่อ" class="text-left" sortable>
               <template #body="{ data }">
                 {{ data.ic_name }}
               </template>
             </Column>
 
-            <Column field="ic_name_2" header="ชื่ออังกฤษ" class="text-right" sortable>
+            <Column field="ic_name_2" header="ชื่ออังกฤษ" class="text-left" sortable>
               <template #body="{ data }">
                 {{ data.ic_name_2 }}
               </template>
@@ -393,31 +397,31 @@ function exportExcel() {
               </template>
             </Column>
 
-            <Column field="totalb" header="ปลีกเชื่อ" class="text-center" sortable>
+            <Column field="totalb" header="ปลีกเชื่อ" class="text-right" sortable>
               <template #body="{ data }">
                 {{ formatNumber(data.totalb) }}
               </template>
             </Column>
 
-            <Column field="totalc" header="ขายส่ง" class="text-center" sortable>
+            <Column field="totalc" header="ขายส่ง" class="text-right" sortable>
               <template #body="{ data }">
                 {{ formatNumber(data.totalc) }}
               </template>
             </Column>
 
-            <Column field="xxx" header="ราคาซื้อ" class="text-center" sortable>
+            <Column field="xxx" header="ราคาซื้อ" class="text-right" sortable>
               <template #body="{ data }">
                 {{ formatNumber(data.xxx) }}
               </template>
             </Column>
 
-            <Column field="totald" header="ซื้อล่าสุด" class="text-center" sortable>
+            <Column field="totald" header="ซื้อล่าสุด" class="text-right" sortable>
               <template #body="{ data }">
                 {{ formatNumber(data.totald) }}
               </template>
             </Column>
 
-            <Column field="totale" header="ทุนเฉลี่ย" class="text-center" sortable>
+            <Column field="totale" header="ทุนเฉลี่ย" class="text-right" sortable>
               <template #body="{ data }">
                 {{ formatNumber(data.totale) }}
               </template>

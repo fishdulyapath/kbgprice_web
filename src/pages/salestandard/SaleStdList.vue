@@ -8,9 +8,10 @@ import MasterdataService from "@/services/MasterdataService";
 import Utils from "@/utils/";
 import { FilterMatchMode } from 'primevue/api';
 import XLSX from "xlsx";
-
+import { useToast } from "primevue/usetoast";
 const storeApp = useApp();
 
+const toast = useToast();
 const data_brand = ref([]);
 const data_category = ref([]);
 const data_design = ref([]);
@@ -132,6 +133,11 @@ const getStatusSeverity = (status) => {
   }
 };
 
+const onCellEditComplete = (e) => {
+  const { data, newValue, field } = e;
+  const doubleValue = parseFloat(newValue); // Convert newValue to a floating-point number
+  data[field] = isNaN(doubleValue) ? 0 : doubleValue; // Ensure it's a valid number, default to 0 if conversion fails
+};
 
 async function getMasterData() {
 
@@ -203,22 +209,30 @@ function updatePrice() {
       console.log('updateData.value.sale_price2 ' + updateData.value.sale_price2)
 
       console.log(item)
-      item.from_qty = (updateData.value.from_qty != null && updateData.value.from_qty != '') ? updateData.value.from_qty : item.from_qty;
-      item.to_qty = (updateData.value.to_qty != null && updateData.value.to_qty != '') ? updateData.value.to_qty : item.to_qty;
+      // item.from_qty = (updateData.value.from_qty != null && updateData.value.from_qty != '') ? updateData.value.from_qty : item.from_qty;
+      // item.to_qty = (updateData.value.to_qty != null && updateData.value.to_qty != '') ? updateData.value.to_qty : item.to_qty;
       item.from_date = (from_datex != null && from_datex != '') ? from_datex : item.from_date;
       item.to_date = (to_datex != null && to_datex != '') ? to_datex : item.to_date;
-      item.sale_type = (updateData.value.sale_type != null && updateData.value.sale_type != '') ? updateData.value.sale_type : item.sale_type;
-      item.transport_type = (updateData.value.transport_type != null && updateData.value.transport_type != '') ? updateData.value.transport_type : item.transport_type;
+      // item.sale_type = (updateData.value.sale_type != null && updateData.value.sale_type != '') ? updateData.value.sale_type : item.sale_type;
+      // item.transport_type = (updateData.value.transport_type != null && updateData.value.transport_type != '') ? updateData.value.transport_type : item.transport_type;
       item.sale_price1 = (updateData.value.sale_price1 != null && updateData.value.sale_price1 != '') ? updateData.value.sale_price1 : item.sale_price1;
       item.sale_price2 = (updateData.value.sale_price2 != null && updateData.value.sale_price2 != '') ? updateData.value.sale_price2 : item.sale_price2;
       item.status = (updateData.value.status != null && updateData.value.status != '') ? updateData.value.status : item.status;
-      item.price_type = (updateData.value.price_type != null && updateData.value.price_type != '') ? updateData.value.price_type : item.price_type;
-      item.cust_code = (updateData.value.cust_code != null && updateData.value.cust_code != '') ? updateData.value.cust_code : item.cust_code;
-      item.cust_group_1 = (updateData.value.group_main != null && updateData.value.group_main != '') ? updateData.value.group_main : item.cust_group_1;
-      item.cust_group_2 = (updateData.value.group_sub != null && updateData.value.group_sub != '') ? updateData.value.group_sub : item.cust_group_2;
+      // item.price_type = (updateData.value.price_type != null && updateData.value.price_type != '') ? updateData.value.price_type : item.price_type;
+      // item.cust_code = (updateData.value.cust_code != null && updateData.value.cust_code != '') ? updateData.value.cust_code : item.cust_code;
+      // item.cust_group_1 = (updateData.value.group_main != null && updateData.value.group_main != '') ? updateData.value.group_main : item.cust_group_1;
+      // item.cust_group_2 = (updateData.value.group_sub != null && updateData.value.group_sub != '') ? updateData.value.group_sub : item.cust_group_2;
     });
   }
 
+}
+
+function convertStatus(status) {
+  return status == 1 || status == "1"
+}
+
+function updateStatus(data, value) {
+  data.status = value ? 1 : 0;
 }
 
 function exportExcel() {
@@ -254,6 +268,54 @@ function exportExcel() {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Price List");
 
     XLSX.writeFile(workbook, "ราคาทั่วไป.xlsx");
+  }
+}
+
+function saveUpdate() {
+  if (selectedProduct.value == null) selectedProduct.value = [];
+  if (selectedProduct.value.length > 0) {
+    console.log(selectedProduct.value);
+    var data = [];
+    selectedProduct.value.forEach((item) => {
+      var obj = {
+        roworder: item.roworder,
+        ic_code: item.ic_code,
+        unit_code: item.unit_code,
+        from_qty: item.from_qty,
+        to_qty: item.to_qty,
+        from_date: item.from_date,
+        to_date: item.to_date,
+        sale_type: item.sale_type,
+        transport_type: item.transport_type,
+        sale_price1: item.sale_price1,
+        sale_price2: item.sale_price2,
+        status: item.status,
+        price_type: item.price_type,
+        cust_code: item.cust_code,
+        cust_group_1: item.cust_group_1,
+        cust_group_2: item.cust_group_2,
+      };
+      data.push(obj);
+    });
+
+    var post_data = {
+      creator_code: localStorage._usercode,
+      details: data,
+    };
+    console.log(post_data);
+    MasterdataService.saveItemPriceSTD(post_data)
+      .then((res) => {
+        console.log(res);
+        if (res.success) {
+          getItemPriceList()
+          toast.add({ severity: "success", summary: "บันทึกรายการสำเร็จ", detail: res.message });
+        } else {
+          toast.add({ severity: "error", summary: "บันทึกรายการล้มเหลว", detail: res.message });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }
 
@@ -316,16 +378,16 @@ function exportExcel() {
               </div>
             </div>
           </Panel>
-          <Panel header="ปรับราคา และ ส่งออก" :toggleable="true" :collapsed="true">
+          <Panel header="ปรับราคา และ ส่งออก" :toggleable="true" :collapsed="false">
             <div class="grid formgrid p-fluid">
-              <div class="field col-6 md:col-2">
+              <!-- <div class="field col-6 md:col-2">
                 <label class="font-medium text-900">จากจำนวน</label>
                 <InputText type="number" v-model="updateData.from_qty" />
               </div>
               <div class="field col-6 md:col-2">
                 <label class="font-medium text-900">ถึงจำนวน</label>
                 <InputText type="number" v-model="updateData.to_qty" />
-              </div>
+              </div> -->
               <div class="field col-6 md:col-2">
                 <label class="font-medium text-900">จากวันที่</label>
                 <Calendar dateFormat="yy-mm-dd" :showIcon="true" v-model="updateData.from_date"> </Calendar>
@@ -334,14 +396,14 @@ function exportExcel() {
                 <label class="font-medium text-900">ถึงวันที่</label>
                 <Calendar dateFormat="yy-mm-dd" :showIcon="true" v-model="updateData.to_date"> </Calendar>
               </div>
-              <div class="field col-6 md:col-2">
+              <!-- <div class="field col-6 md:col-2">
                 <label class="font-medium text-900">ประเภทขาย</label>
                 <Dropdown v-model="updateData.sale_type" :options="data_sale_type" showClear optionLabel="name" optionValue="code" placeholder="เลือกประเภทการขาย" />
               </div>
               <div class="field col-6 md:col-2">
                 <label class="font-medium text-900">ประเภทส่ง</label>
                 <Dropdown v-model="updateData.transport_type" :options="data_trans_type" showClear optionLabel="name" optionValue="code" placeholder="เลือกประเภทการส่ง" />
-              </div>
+              </div> -->
               <div class="field col-6 md:col-2">
                 <label class="font-medium text-900">ราคาแยกภาษี</label>
                 <InputText type="text" v-model="updateData.sale_price1" />
@@ -354,7 +416,7 @@ function exportExcel() {
                 <label class="font-medium text-900">สถานะ</label>
                 <Dropdown v-model="updateData.status" :options="data_status" showClear optionLabel="name" optionValue="code" placeholder="เลือกสถานะ" />
               </div>
-              <div class="field col-6 md:col-2">
+              <!-- <div class="field col-6 md:col-2">
                 <label class="font-medium text-900">ประเภทราคา</label>
                 <Dropdown v-model="updateData.price_type" :options="data_price_type" showClear optionLabel="name" optionValue="code" placeholder="เลือกประเภท" />
               </div>
@@ -369,27 +431,22 @@ function exportExcel() {
               <div class="field col-6 md:col-2">
                 <label class="font-medium text-900">กลุ่มย่อย</label>
                 <Dropdown v-model="updateData.group_sub" :options="data_group_sub" showClear filter optionLabel="name" optionValue="code" placeholder="เลือกกลุ่มหลัก" />
-              </div>
+              </div> -->
               <div class="field col-12">
                 <Button label="ปรับราคา" icon="pi pi-play" class="w-auto p-button-success" @click="updatePrice"></Button>
+                <Button label="บันทึกรายการที่เลือก" icon="pi pi-save" class="w-auto p-button-danger ml-2" @click="saveUpdate"></Button>
                 <Button label="Export" icon="pi pi-download" class="w-auto p-button-info ml-2" @click="exportExcel"></Button>
               </div>
             </div>
           </Panel>
         </div>
         <div class="card shadow-2 border-round bg-white mt-2" v-if="data_list.length > 0" style="max-width: 97vw;">
-          <DataTable v-model:filters="filters" :value="data_list" v-model:selection="selectedProduct" paginator resizableColumns columnResizeMode="fit" showGridlines :rows="10"
-            dataKey="roworder" :loading="loading" paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-            :rowsPerPageOptions="[10, 50, 100, 150]" currentPageReportTemplate="Showing {first} to {last} of {totalRecords}" responsiveLayout="scroll"
-            :globalFilterFields="['ic_code', 'unit_code', 'group_main', 'group_sub', 'sale_type', 'price_type', 'status']">
-            <template #header>
-              <div class="flex justify-content-start">
-                <span class="p-input-icon-left">
-                  <i class="pi pi-search" />
-                  <InputText v-model="filters['global'].value" placeholder="ค้นหา..." />
-                </span>
-              </div>
-            </template>
+          <DataTable  :value="data_list" editMode="cell" @cell-edit-complete="onCellEditComplete" v-model:selection="selectedProduct" paginator
+            resizableColumns columnResizeMode="fit" showGridlines :rows="10" dataKey="roworder" :loading="loading"
+            paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown" :rowsPerPageOptions="[10, 50, 100, 150]"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}" responsiveLayout="scroll"
+           >
+
             <template #empty> ไม่พบข้อมูล </template>
             <template #loading> กำลังโหลดข้อมูล กรุณารอสักครู่ </template>
             <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
@@ -441,20 +498,27 @@ function exportExcel() {
               </template>
             </Column>
 
-            <Column field="sale_price1" header="ราคาแยกภาษี" bodyClass="text-right" sortable>
+            <Column field="sale_price1" header="ราคาแยกภาษี" bodyClass="text-right" sortable style="color:blueviolet">
+              
               <template #body="{ data }">
                 {{ Utils.formatMoney(data.sale_price1) }}
               </template>
+              <template #editor="{ data, field }">
+                <InputText fluid type="text" v-model="data[field]" />
+              </template>
             </Column>
 
-            <Column field="sale_price2" header="ราคารวมภาษี" bodyClass="text-right" sortable>
+            <Column field="sale_price2" header="ราคารวมภาษี" bodyClass="text-right" sortable style="color:orange">
               <template #body="{ data }">
                 {{ Utils.formatMoney(data.sale_price2) }}
+              </template>
+              <template #editor="{ data, field }">
+                <InputText fluid type="text" v-model="data[field]" />
               </template>
             </Column>
             <Column field="status" header="สถานะ" class="text-center" sortable>
               <template #body="{ data }">
-                <Tag :value="getStatusName(data.status)" :severity="getStatusSeverity(data.status)" />
+                <Checkbox :model-value="convertStatus(data.status)" @update:model-value="value => updateStatus(data, value)" :binary="true" />
               </template>
             </Column>
 
@@ -490,7 +554,7 @@ function exportExcel() {
 
             <Column field="doc_date" header="วันที่" sortable>
               <template #body="{ data }">
-                <span v-if="data.doc_no != ''">{{ data.doc_date }} {{ data.doc_time }}</span>
+                <span v-if="data.doc_no != '' || data.creator_code != ''">{{ data.doc_date }} {{ data.doc_time }}</span>
               </template>
             </Column>
 
@@ -506,8 +570,4 @@ function exportExcel() {
     </MainContentWarp>
   </AppLayout>
 </template>
-<style>
-.p-datatable .p-datatable-tbody > tr > td {
-  padding: 8px !important;
-}
-</style>
+

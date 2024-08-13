@@ -16,3 +16,8 @@ onMounted(() => {
 <style lang="scss">
 @import "./assets/styles/app.scss";
 </style>
+<style>
+.p-datatable .p-datatable-tbody>tr>td {
+  padding: 8px !important;
+}
+</style>
