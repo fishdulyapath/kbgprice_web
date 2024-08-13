@@ -23,7 +23,7 @@ const data_trans_type = ref([{ code: '0', name: 'รับเอง' }, { code: 
 const data_price_type = ref([{ code: '1', name: 'ปรกติ' }, { code: '2', name: 'ตามกลุ่ม' }, { code: '3', name: 'ตามลูกค้า' }]);
 const data_status = ref([{ code: '1', name: 'ใช้งาน' }, { code: '0', name: 'ยกเลิก' }]);
 const loading = ref(true);
-const nosentprice = ref(false)
+const nosentprice = ref("0")
 const filterData = ref({
   search: '',
   sale_type: null,
@@ -205,10 +205,10 @@ async function getItemPriceList() {
   var itempattern = filterData.value.pattern != null ? filterData.value.pattern : '';
   var itemcategory = filterData.value.category != null ? filterData.value.category : '';
   var itemdesign = filterData.value.design != null ? filterData.value.design : '';
-  var nosentpricex = nosentprice.value ? '1' : '0';
+  var nosentpricex = nosentprice.value != null ? nosentprice.value : '0';
   loading.value = true;
 
-  await MasterdataService.getItemPriceDashboardList(filterData.value.search, sale_type, trans_type, price_type, groupmain, itembrand, groupsub, itempattern, itemmodel, itemcategory, itemdesign,nosentpricex)
+  await MasterdataService.getItemPriceDashboardList(filterData.value.search, sale_type, trans_type, price_type, groupmain, itembrand, groupsub, itempattern, itemmodel, itemcategory, itemdesign, nosentpricex)
     .then((res) => {
       console.log(res);
       if (res.success) {
@@ -348,10 +348,23 @@ function exportExcel() {
               </div>
 
               <div class="field mb-4 col-12 ">
-                <div class="flex items-center">
-                  <Checkbox v-model="nosentprice" :binary="true" />
-                  <label  class="ml-2"> ไม่มีราคาขายส่ง </label>
+               
+                <div class="flex flex-wrap gap-4">
+                  <div class="flex items-center">
+                    <RadioButton v-model="nosentprice" value="0" />
+                    <label class="ml-2">ทั้งหมด</label>
+                  </div>
+                  <div class="flex items-center">
+                    <RadioButton v-model="nosentprice" value="1" class="ml-2"/>
+                    <label class="ml-2">มีราคาขายส่ง</label>
+                  </div>
+                  <div class="flex items-center">
+                    <RadioButton v-model="nosentprice" value="2" class="ml-2" />
+                    <label class="ml-2">ไม่มีราคาขายส่ง</label>
+                  </div>
+
                 </div>
+
               </div>
 
 
