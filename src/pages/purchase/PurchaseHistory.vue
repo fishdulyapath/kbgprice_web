@@ -212,6 +212,7 @@ function getDetailList() {
                         </Column>
 
                         <Column field="ic_code" header="สินค้า" sortable></Column>
+                        <Column field="item_name" header="ชื่อสินค้า" sortable></Column>
                         <Column field="unit_code" header="หน่วย" sortable></Column>
                         <Column field="from_qty" header="จากจำนวน" sortable></Column>
                         <Column field="to_qty" header="ถึงจำนวน" sortable></Column>
@@ -231,11 +232,7 @@ function getDetailList() {
                                 {{ Utils.getSaleTypeName(slotProps.data.sale_type) }}
                             </template>
                         </Column>
-                        <Column field="transport_type" header="ประเภทการส่ง" sortable bodyStyle="text-align:center">
-                            <template #body="slotProps">
-                                {{ Utils.getTranspotTypeName(slotProps.data.transport_type) }}
-                            </template>
-                        </Column>
+      
                         <Column field="price_type" header="ประเภทราคา" sortable bodyStyle="text-align:center">
                             <template #body="slotProps">
                                 {{ Utils.getPriceTypeName2(slotProps.data.price_type) }}

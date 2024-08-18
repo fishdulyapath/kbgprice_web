@@ -80,6 +80,7 @@ function ImportFile() {
       console.log(results[index]);
       details.push({
         item_code: results[index].รหัสสินค้า != undefined ? results[index].รหัสสินค้า.toString().trim() : "",
+        item_name: results[index].ชื่อสินค้า != undefined ? results[index].ชื่อสินค้า.toString().trim() : "",
         unit_code: results[index].หน่วยนับ != undefined ? results[index].หน่วยนับ.toString().trim() : "",
         from_qty: results[index].จากจำนวน != undefined ? results[index].จากจำนวน.toString().trim() : "",
         to_qty: results[index].ถึงจำนวน != undefined ? results[index].ถึงจำนวน.toString().trim() : "",
@@ -202,7 +203,7 @@ function confirmImport() {
                 <Button label="บันทึก" icon="pi pi-play" class="w-auto p-button-success" @click="confirmImport" v-if="import_data.length > 0"></Button>
 
                 <FileUpload mode="basic" name="input file" accept=".xls,.xlsx" ref="myFiles" :customUpload="true" @change="ImportFile()"
-                  class="p-button-plain p-button-primary ml-2" chooseIcon="pi pi-upload" chooseLabel="นำเข้าราคาทั่วไป"></FileUpload>
+                  class="p-button-plain p-button-primary ml-2" chooseIcon="pi pi-upload" chooseLabel="นำเข้าราคาซื้อ"></FileUpload>
               </div>
             </div>
           </Panel>
@@ -211,6 +212,7 @@ function confirmImport() {
               paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown" :rowsPerPageOptions="[50, 70, 100]"
               currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
               <Column field="item_code" header="สินค้า" sortable></Column>
+              <Column field="item_name" header="ชื่อสินค้า" sortable></Column>
               <Column field="unit_code" header="หน่วย" sortable class="text-center"></Column>
               <Column field="from_qty" header="จากจำนวน" sortable class="text-right">
                 <template #body="slotProps">
@@ -225,7 +227,7 @@ function confirmImport() {
               <Column field="from_date" header="จากวันที่" sortable class="text-center"></Column>
               <Column field="to_date" header="ถึงวันที่" sortable class="text-center"></Column>
               <Column field="sale_type" header="ประเภทการขาย" sortable class="text-center"></Column>
-              <Column field="transport_type" header="ประเภทการขนส่ง" sortable class="text-center"></Column>
+              <!-- <Column field="transport_type" header="ประเภทการขนส่ง" sortable class="text-center"></Column> -->
               <Column field="sale_price1" header="ราคาแยกภาษี" sortable class="text-right" style="color:blueviolet">
                 <template #body="slotProps">
                   {{ Utils.formatMoney(slotProps.data.sale_price1) }}

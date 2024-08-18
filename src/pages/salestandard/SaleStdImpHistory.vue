@@ -235,11 +235,11 @@ const getStatusSeverity = (status) => {
                                 {{ Utils.getSaleTypeName(slotProps.data.sale_type) }}
                             </template>
                         </Column>
-                        <Column field="transport_type" header="ประเภทการส่ง" sortable bodyStyle="text-align:center">
+                        <!-- <Column field="transport_type" header="ประเภทการส่ง" sortable bodyStyle="text-align:center">
                             <template #body="slotProps">
                                 {{ Utils.getTranspotTypeName(slotProps.data.transport_type) }}
                             </template>
-                        </Column>
+                        </Column> -->
                         <Column field="price_type" header="ประเภทราคา" sortable bodyStyle="text-align:center">
                             <template #body="slotProps">
                                 {{ Utils.getPriceTypeName(slotProps.data.price_type) }}

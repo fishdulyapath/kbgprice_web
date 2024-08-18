@@ -192,6 +192,7 @@ function confirmImport() {
               paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown" :rowsPerPageOptions="[15, 50, 100]"
               currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
               <Column field="item_code" header="สินค้า" sortable></Column>
+              <Column field="item_name" header="ชื่อสินค้า" sortable></Column>
               <Column field="unit_code" header="หน่วย" sortable class="text-center"></Column>
               <Column field="from_qty" header="จากจำนวน" sortable class="text-right">
                 <template #body="slotProps">
@@ -210,11 +211,11 @@ function confirmImport() {
                   {{ Utils.getSaleTypeName(slotProps.data.sale_type) }}
                 </template>
               </Column>
-              <Column field="transport_type" header="ประเภทการขนส่ง" sortable class="text-center">
+              <!-- <Column field="transport_type" header="ประเภทการขนส่ง" sortable class="text-center">
                 <template #body="slotProps">
                   {{ Utils.getTranspotTypeName(slotProps.data.transport_type) }}
                 </template>
-              </Column>
+              </Column> -->
               <Column field="sale_price1" header="ราคาแยกภาษี" sortable class="text-right" style="color: blueviolet">
                 <template #body="slotProps">
                   {{ Utils.formatMoney(slotProps.data.sale_price1) }}

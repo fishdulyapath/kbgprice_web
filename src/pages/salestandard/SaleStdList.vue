@@ -246,6 +246,7 @@ function exportExcel() {
     selectedProduct.value.forEach((item) => {
       var data = {
         รหัสสินค้า: item.ic_code.toString(),
+        ชื่อสินค้า: item.item_name.toString(),
         หน่วยนับ: item.unit_code.toString(),
         จากจำนวน: item.from_qty.toString(),
         ถึงจำนวน: item.to_qty.toString(),
@@ -267,7 +268,7 @@ function exportExcel() {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Price List");
 
-    XLSX.writeFile(workbook, "ราคาทั่วไป.xlsx");
+    XLSX.writeFile(workbook, "ราคามาตรฐาน.xlsx");
   }
 }
 
@@ -441,11 +442,10 @@ function saveUpdate() {
           </Panel>
         </div>
         <div class="card shadow-2 border-round bg-white mt-2" v-if="data_list.length > 0" style="max-width: 97vw;">
-          <DataTable  :value="data_list" editMode="cell" @cell-edit-complete="onCellEditComplete" v-model:selection="selectedProduct" paginator
-            resizableColumns columnResizeMode="fit" showGridlines :rows="10" dataKey="roworder" :loading="loading"
+          <DataTable :value="data_list" editMode="cell" @cell-edit-complete="onCellEditComplete" v-model:selection="selectedProduct" paginator resizableColumns
+            columnResizeMode="fit" showGridlines :rows="10" dataKey="roworder" :loading="loading"
             paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown" :rowsPerPageOptions="[10, 50, 100, 150]"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}" responsiveLayout="scroll"
-           >
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}" responsiveLayout="scroll">
 
             <template #empty> ไม่พบข้อมูล </template>
             <template #loading> กำลังโหลดข้อมูล กรุณารอสักครู่ </template>
@@ -455,7 +455,11 @@ function saveUpdate() {
                 {{ data.ic_code }}
               </template>
             </Column>
-
+            <Column field="item_name" header="ชื่อสินค้า" sortable>
+              <template #body="{ data }">
+                {{ data.item_name }}
+              </template>
+            </Column>
             <Column field="unit_code" header="หน่วย" class="text-center" sortable>
               <template #body="{ data }">
                 {{ data.unit_code }}
@@ -492,14 +496,14 @@ function saveUpdate() {
               </template>
             </Column>
 
-            <Column field="transport_type" header="ประเภทส่ง" class="text-center" sortable>
+            <!-- <Column field="transport_type" header="ประเภทส่ง" class="text-center" sortable>
               <template #body="{ data }">
                 {{ getTransTypeName(data.transport_type) }}
               </template>
-            </Column>
+            </Column> -->
 
             <Column field="sale_price1" header="ราคาแยกภาษี" bodyClass="text-right" sortable style="color:blueviolet">
-              
+
               <template #body="{ data }">
                 {{ Utils.formatMoney(data.sale_price1) }}
               </template>
@@ -570,4 +574,3 @@ function saveUpdate() {
     </MainContentWarp>
   </AppLayout>
 </template>
-

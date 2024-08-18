@@ -313,6 +313,7 @@ function exportExcel() {
     selectedProduct.value.forEach((item) => {
       var data = {
         รหัสสินค้า: item.ic_code.toString(),
+        ชื่อสินค้า: item.item_name.toString(),
         หน่วยนับ: item.unit_code.toString(),
         จากจำนวน: item.from_qty.toString(),
         ถึงจำนวน: item.to_qty.toString(),
@@ -473,6 +474,13 @@ function exportExcel() {
               </template>
             </Column>
 
+            <Column field="item_name" header="ชื่อสินค้า" sortable>
+              <template #body="{ data }">
+                {{ data.item_name }}
+              </template>
+            </Column>
+
+
             <Column field="unit_code" header="หน่วย" class="text-center" sortable>
               <template #body="{ data }">
                 {{ data.unit_code }}
@@ -510,12 +518,12 @@ function exportExcel() {
                 {{ getSaleTypeName(data.sale_type) }}
               </template>
             </Column>
-
+<!-- 
             <Column field="transport_type" header="ประเภทส่ง" class="text-center" sortable>
               <template #body="{ data }">
                 {{ getTransTypeName(data.transport_type) }}
               </template>
-            </Column>
+            </Column> -->
 
             <Column field="sale_price1" header="ราคาแยกภาษี" bodyClass="text-right" sortable style="color:blueviolet">
               

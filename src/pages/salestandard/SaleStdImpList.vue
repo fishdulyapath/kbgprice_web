@@ -99,7 +99,7 @@ function viewDetails(docNo) {
           <div class="flex justify-content-start">
             <div class="flex-none flex">
               <Button label="ประมวลผล" icon="pi pi-play" class="w-auto p-button-success" @click="getDocList"></Button>
-              <Button label="นำเข้าราคาทั้วไป" icon="pi pi-upload" class="w-auto p-button-info ml-2" @click="goToImport"></Button>
+              <Button label="นำเข้าราคา" icon="pi pi-upload" class="w-auto p-button-info ml-2" @click="goToImport"></Button>
             </div>
           </div>
         </Panel>
